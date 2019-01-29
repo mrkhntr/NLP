@@ -18,7 +18,7 @@ def format_file(filename):
             print line,  # remove newline characters
 
 def data_preprocess():
-    training_set_path = '/Users/raihans/Northeastern/Spring2019/NLP/Assignment1/LanguageModeling/gutenberg/'
+    training_set_path = os.getcwd() + '/gutenberg/'
     file_names = os.listdir(training_set_path)
 
     c = Counter()
