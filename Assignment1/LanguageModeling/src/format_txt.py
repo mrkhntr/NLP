@@ -13,11 +13,11 @@ def format_file(filename):
         line = format_line(line)
         print line
 
-def data_preprocess():
-    training_set_path = os.getcwd() + '/bigram_counts.txt'
+def add_newlines():
+    training_set_path = os.getcwd() + '/trigram_counts.txt'
 
     format_file(training_set_path)
     f = open(training_set_path)
     f.close()
 
-# data_preprocess()
+# add_newlines()
