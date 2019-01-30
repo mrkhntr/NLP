@@ -32,15 +32,12 @@ def data_preprocess():
     training_set_path = os.getcwd() + '/gutenberg/'
     file_names = os.listdir(training_set_path)
 
-    c = Counter()
+    unigram = Counter()
     for filename in file_names:
         format_file(training_set_path + filename)
         f = open(training_set_path + filename)
-        c += Counter(f.read().strip())
+        unigram += Counter(f.read().strip())
         f.close()
 
-    print c
-
-
-data_preprocess()
+    return unigram
 

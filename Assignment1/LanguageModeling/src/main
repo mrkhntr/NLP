@@ -1,6 +1,7 @@
+import data_preprocess
+
 def main():
-    print 'hi'
+    #  data_preprocess.data_preprocess()
+    pass
 
 main()
-
-# assert(ip == '172.217.10.228')
