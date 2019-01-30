@@ -1,6 +1,14 @@
+# -*- coding: utf-8 -*-
 import fileinput
 import os
 from collections import Counter
+
+def replace_unk(line):
+    unk = ['\x1a', '\xe6', '\xe9', '\xe8', '\xee', '\xef', '\xbd', '\xbf']
+    if any(s in line for s in unk):
+        for sym in unk:
+            line = line.replace(sym, '?')
+    return line
 
 
 def format_line(line):
@@ -9,13 +17,16 @@ def format_line(line):
     line = line.rstrip()  # remove blank lines
     line = ' '.join(line.split())  # remove duplicate spaces
     line = line.translate(None, punctuation)  # remove punctuation
+    line = replace_unk(line)
     return line
+
 
 def format_file(filename):
     for line in fileinput.FileInput(filename, inplace=1):
         line = format_line(line)
         if line:
             print line,  # remove newline characters
+
 
 def data_preprocess():
     training_set_path = os.getcwd() + '/gutenberg/'
@@ -29,6 +40,7 @@ def data_preprocess():
         f.close()
 
     print c
+
 
 data_preprocess()
 
