@@ -3,18 +3,19 @@ import fileinput
 import os
 
 
+#  ? will be known as our <unk>
 def replace_unk(line):
-    unk = ['\x1a', '\xe6', '\xe9', '\xe8', '\xee', '\xef', '\xbd', '\xbf']
+    unk = ['\x98', '\x85', '\x12', '\xa9', '\x18', '\x16', '\xf3', '\x0f', '\x13',
+           '\xe8', '\x1a', '\xe9', '\x15', '\xe6', '\x14', '\x03' '\x11', '\xee', '\x11',
+           '\x03']
     if any(s in line for s in unk):
         for sym in unk:
             line = line.replace(sym, '?')
     return line
 
 
-# TODO: Get rid of random unicode characters from unigram
 def format_line(line):
-    punctuation = ',.-";\'!_?:`)(&[]*}/$%>@<+=~'
-    # unicode_chars = ['\x00', '\xff', '\x01', '\x10']
+    punctuation = ',.-";\'!_?:`)(&[]*}/$%>@<+=~\r'
 
     line = line.rstrip()  # remove blank lines
     line = ' '.join(line.split())  # remove duplicate spaces

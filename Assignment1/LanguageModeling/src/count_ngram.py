@@ -60,10 +60,13 @@ def count_ngrams(ngram_method):
     return ngram
 
 
-def print_ngram_to_file(ngram, filename):
-    text_file = open(ngram_output_path + filename, "w")
+def print_json_ngram_to_file(ngram, filename):
+    file_path = ngram_output_path + filename
+
+    text_file = open(file_path, "w")
     text_file.write(str(ngram))
     text_file.close()
+    jsonify_file(file_path)
 
 
 def jsonify_line(line):
@@ -82,26 +85,15 @@ def jsonify_file(filename):
         print line,
 
 
-def jsonify_ngram_counts():
-    ngram_file_names = os.listdir(ngram_output_path)
-
-    for filename in ngram_file_names:
-        jsonify_file(ngram_output_path + filename)
-        f = open(training_set_path + filename)
-        f.close()
-
-
 def main():
     #  The Counter object by itself will just aggregate letter counts
     unigram = count_ngrams(Counter)
     bigram = count_ngrams(count_bigram)
     trigram = count_ngrams(count_trigram)
 
-    print_ngram_to_file(unigram, "ex_unigram_counts.txt")
-    print_ngram_to_file(bigram, "ex_bigram_counts.txt")
-    print_ngram_to_file(trigram, "ex_trigram_counts.txt")
-
-    jsonify_ngram_counts()
+    print_json_ngram_to_file(unigram, "unigram_counts.txt")
+    print_json_ngram_to_file(bigram, "bigram_counts.txt")
+    print_json_ngram_to_file(trigram, "trigram_counts.txt")
 
 
 main()
