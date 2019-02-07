@@ -1,7 +1,11 @@
-import data_preprocess
+import json
+import os
+
 
 def main():
-    #  data_preprocess.data_preprocess()
-    pass
+    with open(os.getcwd() + '/ngram_counts/trigram_counts.txt') as fh:
+        a = json.load(fh)
+
+    print a['  t']
 
 main()

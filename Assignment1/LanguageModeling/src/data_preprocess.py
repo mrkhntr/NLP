@@ -27,7 +27,8 @@ def format_file(filename):
         if line:
             print line,  # remove newline characters
 
-
+# TODO: First data_preprocess, then count_ngram and print to file,
+# TODO:      and finally, format each file into json format
 def data_preprocess():
     training_set_path = os.getcwd() + '/gutenberg/'
     file_names = os.listdir(training_set_path)
