@@ -1,5 +1,10 @@
 import os
 from collections import Counter
+import fileinput
+
+training_set_path = os.getcwd() + '/gutenberg/'
+ngram_output_path = os.getcwd() + '/ngram_counts/'
+
 
 def count_bigram(text):
     bigram_count = Counter({})
@@ -13,13 +18,14 @@ def count_bigram(text):
             else:
                 bigram_count[entry] = 1
 
-    print bigram_count
     return bigram_count
+
 
 assert(count_bigram('ab') == Counter({'ab': 1}))
 assert(count_bigram('abc') == Counter({'ab': 1, 'bc': 1}))
 assert(count_bigram('a bc') == Counter({' b': 1, 'a ': 1, 'bc': 1}))
 assert(count_bigram('a bca bca bc') == Counter({' b': 3, 'a ': 3, 'bc': 3, 'ca': 2}))
+
 
 def count_trigram(text):
     trigram_count = Counter({})
@@ -32,25 +38,70 @@ def count_trigram(text):
             else:
                 trigram_count[entry] = 1
 
-    print trigram_count
     return trigram_count
+
 
 assert(count_trigram('abc') == Counter({'abc': 1}))
 assert(count_trigram('abcd') == Counter({'abc': 1, 'bcd': 1}))
 assert(count_trigram('abcdef') == Counter({'abc': 1, 'bcd': 1, 'cde': 1, 'def': 1}))
 assert(count_trigram('ab cab c') == Counter({'ab ': 2, 'b c': 2, 'cab': 1, ' ca': 1}))
 
-def main():
+
+def count_ngrams(ngram_method):
+    ngram = Counter({})
     training_set_path = os.getcwd() + '/gutenberg/'
     file_names = os.listdir(training_set_path)
 
-    trigram = Counter({})
     for filename in file_names:
         f = open(training_set_path + filename)
-        trigram += count_trigram(f.read().strip())
+        ngram += ngram_method(f.read().strip())
         f.close()
 
-    print trigram
+    return ngram
 
 
-# main()
+def print_ngram_to_file(ngram, filename):
+    text_file = open(ngram_output_path + filename, "w")
+    text_file.write(str(ngram))
+    text_file.close()
+
+
+def jsonify_line(line):
+    # NOTE WE NEED TO REMOVE THE COUNTER FROM THE FIRST AND LAST LINE
+    line = line.replace("Counter(", "")
+    line = line.replace(")", "")
+
+    line = line.replace(',', ',\n')
+    line = line.replace("'", "\"")
+    return line
+
+
+def jsonify_file(filename):
+    for line in fileinput.FileInput(filename, inplace=1):
+        line = jsonify_line(line)
+        print line,
+
+
+def jsonify_ngram_counts():
+    ngram_file_names = os.listdir(ngram_output_path)
+
+    for filename in ngram_file_names:
+        jsonify_file(ngram_output_path + filename)
+        f = open(training_set_path + filename)
+        f.close()
+
+
+def main():
+    #  The Counter object by itself will just aggregate letter counts
+    unigram = count_ngrams(Counter)
+    bigram = count_ngrams(count_bigram)
+    trigram = count_ngrams(count_trigram)
+
+    print_ngram_to_file(unigram, "ex_unigram_counts.txt")
+    print_ngram_to_file(bigram, "ex_bigram_counts.txt")
+    print_ngram_to_file(trigram, "ex_trigram_counts.txt")
+
+    jsonify_ngram_counts()
+
+
+main()
