@@ -1,12 +1,29 @@
 import json
 import os
+from sklearn.model_selection import train_test_split
+
+training_set_path = os.getcwd() + '/gutenberg/'
+file_names = os.listdir(training_set_path)
 
 
 def main():
-    with open(os.getcwd() + '/ngram_counts/trigram_counts.txt') as fh:
-        a = json.load(fh)
+    with open(os.getcwd() + '/ngram_counts/unigram_counts.txt') as fh:
+        unigram_counts = json.load(fh)
 
-    print a['  t']
+    with open(os.getcwd() + '/ngram_counts/bigram_counts.txt') as fh:
+        bigrams_counts = json.load(fh)
+
+    with open(os.getcwd() + '/ngram_counts/trigram_counts.txt') as fh:
+        trigrams_counts = json.load(fh)
+
+    data = []
+    for filename in file_names:
+        with open(training_set_path + filename, 'r') as cur_file:
+            data = data + cur_file.read().split(".")
+
+    train, test = train_test_split(data, test_size=0.2)
+
+    train[0]
 
 
 main()
