@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-import fileinput
 import os
+import io
 
 
 #  ? will be known as our <unk>
@@ -19,16 +18,20 @@ def format_line(line):
 
     line = line.rstrip()  # remove blank lines
     line = ' '.join(line.split())  # remove duplicate spaces
-    line = line.translate(None, punctuation)  # remove punctuation
+    remove_punc = str.maketrans('', '', punctuation)
+    line = line.translate(remove_punc)  # remove punctuation
     line = replace_unk(line)
     return line
 
 
 def format_file(filename):
-    for line in fileinput.FileInput(filename, inplace=1):
-        line = format_line(line)
-        if line:
-            print(line, end='')  # remove newline characters
+    with io.open(filename, 'r', encoding='iso-8859-15') as f:
+        text = f.read()
+
+    text = format_line(text)
+
+    with io.open(filename, 'w', encoding='iso-8859-15') as f:
+        f.write(text)
 
 
 def data_preprocess():
@@ -37,8 +40,6 @@ def data_preprocess():
 
     for filename in file_names:
         format_file(training_set_path + filename)
-        f = open(training_set_path + filename)
-        f.close()
 
 
 data_preprocess()

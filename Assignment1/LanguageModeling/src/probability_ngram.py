@@ -20,7 +20,7 @@ def unigram_prob(text, index, unigram):
             cur_prob = unigram_count / float(sum(unigram.values()))
         except Exception as e:
             print(e)
-            print(unigram_char)
+            print(repr(unigram_char))
 
         unigram_and_prob = {
             'text': unigram_char,
