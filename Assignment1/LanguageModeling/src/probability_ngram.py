@@ -1,7 +1,7 @@
 import math
 import self as self
 
-# NOTE: The unigram and bigram models in the tests
+# NOTE: The unigram and bigram models in the test cases
 # do not necessarily model the text exactly
 
 
@@ -17,7 +17,11 @@ def unigram_prob(text, index, unigram):
         unigram_char = text[index]
         unigram_count = unigram.get(unigram_char)
 
-        cur_prob = unigram_count / float(sum(unigram.values()))
+        try:
+            cur_prob = unigram_count / float(sum(unigram.values()))
+        except Exception, e:
+            print e
+            print unigram_char
 
         unigram_and_prob = {
             'text': unigram_char,
