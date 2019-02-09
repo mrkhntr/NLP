@@ -28,7 +28,7 @@ def format_file(filename):
     for line in fileinput.FileInput(filename, inplace=1):
         line = format_line(line)
         if line:
-            print line,  # remove newline characters
+            print(line, end='')  # remove newline characters
 
 
 def data_preprocess():

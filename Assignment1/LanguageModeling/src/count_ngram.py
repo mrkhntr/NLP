@@ -82,7 +82,7 @@ def jsonify_line(line):
 def jsonify_file(filename):
     for line in fileinput.FileInput(filename, inplace=1):
         line = jsonify_line(line)
-        print line,
+        print(line, end='')
 
 
 def main():

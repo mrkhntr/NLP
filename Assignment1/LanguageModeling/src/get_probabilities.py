@@ -11,10 +11,6 @@ def get_unigram_probs(train, unigram):
     unigram_probs = {}
     for c in range(0, len(train)):
         if c+1 != len(train):
-            # print "+++++++++++++++++"
-            # print type(train)
-            # # print train
-            # print train[c]
             text_and_prob = probability_ngram.unigram_prob(train, c, unigram)
             cur_char = text_and_prob.get('text')
             new_prob = text_and_prob.get('prob')
@@ -25,7 +21,7 @@ def get_unigram_probs(train, unigram):
             else:
                 unigram_probs.update({cur_char: new_prob})
 
-    print unigram_probs
+    print(unigram_probs)
     return unigram_probs
 
 def main():
@@ -43,8 +39,8 @@ def main():
         with open(training_set_path + filename, 'r') as cur_file:
             training_corpus = training_corpus + cur_file.read()
 
-    # train, test = train_test_split(training_corpus, test_size=0.2)
+    train, test = train_test_split(training_corpus, test_size=0.2)
 
-    get_unigram_probs(training_corpus, unigram_counts)
+    get_unigram_probs(train, unigram_counts)
 
 main()
