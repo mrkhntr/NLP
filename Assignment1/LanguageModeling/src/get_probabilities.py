@@ -15,14 +15,20 @@ def print_json_ngram_to_file(ngram, filename):
     file_path = ngram_probability_path + filename
 
     utils.write_to_filepath(str(ngram), file_path)
-    # count_ngram.jsonify_file(file_path)
+    count_ngram.jsonify_file(file_path)
 
 
-def get_ngram_probs(train, ngram_probability, ngram_counts):
+def get_ngram_probs(train, ngram_probability, trigram_counts, bigram_counts, unigram_counts):
     ngram_probs = {}
     for c in range(0, len(train)):
         if c+1 != len(train):
-            text_and_prob = ngram_probability(train, c, ngram_counts)
+            if ngram_probability == probability_ngram.trigram_prob:
+                text_and_prob = probability_ngram.trigram_prob(train, c, trigram_counts, bigram_counts, unigram_counts)
+            elif ngram_probability == probability_ngram.bigram_prob:
+                text_and_prob = probability_ngram.bigram_prob(train, c, bigram_counts, unigram_counts)
+            else:
+                text_and_prob = probability_ngram.unigram_prob(train, c, unigram_counts)
+
             cur_char = text_and_prob.get('text')
             new_prob = text_and_prob.get('prob')
 
@@ -35,27 +41,34 @@ def get_ngram_probs(train, ngram_probability, ngram_counts):
     return ngram_probs
 
 def main():
-    with open(os.getcwd() + '/ngram_counts/unigram_counts.txt') as fh:
+    with open(os.getcwd() + '/ngram_counts/unigram_counts.txt', encoding='iso-8859-15') as fh:
         unigram_counts = json.load(fh)
 
-    with open(os.getcwd() + '/ngram_counts/bigram_counts.txt') as fh:
-        bigrams_counts = json.load(fh)
+    with open(os.getcwd() + '/ngram_counts/bigram_counts.txt', encoding='iso-8859-15') as fh:
+        bigram_counts = json.load(fh)
 
-    with open(os.getcwd() + '/ngram_counts/trigram_counts.txt') as fh:
-        trigrams_counts = json.load(fh)
+    with open(os.getcwd() + '/ngram_counts/trigram_counts.txt', encoding='iso-8859-15') as fh:
+        trigram_counts = json.load(fh)
 
     training_corpus = ''
     for filename in file_names:
-        with open(training_set_path + filename, 'r') as cur_file:
+        with open(training_set_path + filename, 'r', encoding='iso-8859-15') as cur_file:
             training_corpus = training_corpus + cur_file.read()
 
     train, test = train_test_split(training_corpus, test_size=0.2)
 
-    unigram_probs = get_ngram_probs(train, probability_ngram.unigram_prob, unigram_counts)
+    train = "".join(train)
+
+    unigram_probs = probability_ngram.get_unigram_prob(train, unigram_counts)
+
     print_json_ngram_to_file(unigram_probs, "unigram_probabilities.txt")
-    bigram_probs = get_ngram_probs(train, probability_ngram.unigram_prob, bigrams_counts)
+
+    bigram_probs = probability_ngram.get_bigram_prob(train, bigram_counts, unigram_counts)
+
     print_json_ngram_to_file(bigram_probs, "bigram_probabilities.txt")
-    trigram_probs = get_ngram_probs(train, probability_ngram.unigram_prob, trigrams_counts)
+
+    trigram_probs = probability_ngram.get_trigram_prob(train, trigram_counts, bigram_counts)
+
     print_json_ngram_to_file(trigram_probs, "trigram_probabilities.txt")
 
 

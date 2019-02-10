@@ -1,95 +1,76 @@
 import math
+import sys
 
-# NOTE: The unigram and bigram models in the test cases
-# do not necessarily model the text exactly
+def get_unigram_prob(text, unigram):
+    unigram_probs = {}
+    unigram_sum = float(sum(unigram.values()))
 
+    for c in range(0, len(text)):
+        if c + 1 != len(text):
+            unigram_char = ''
+            unigram_char += text[c]
 
-def assert_text_and_prob(dictionary, text, prob):
-    assert(dictionary.get('text') == text)
-    assert(dictionary.get('prob') == prob)
+            unigram_count = unigram.get(unigram_char)
 
-# TODO: 1) Should we worry about not being able to find a character
-#   in our dict, and returning some minimum probability?
-#   2) Test error case for unigram prob
-def unigram_prob(text, index, unigram):
-    if index < len(text) and index >= 0:
-        unigram_char = text[index]
-        unigram_count = unigram.get(unigram_char)
+            try:
+                cur_prob = unigram_count / unigram_sum
+            except Exception as e:
+                cur_prob = sys.float_info.min
 
-        try:
-            cur_prob = unigram_count / float(sum(unigram.values()))
-        except Exception as e:
-            print(e)
-            print(repr(unigram_char))
+            if unigram_char in unigram_probs.keys():
+                unigram_probs[unigram_char] += math.log(cur_prob)
+            else:
+                unigram_probs[unigram_char] = math.log(cur_prob)
 
-        unigram_and_prob = {
-            'text': unigram_char,
-            'prob': math.log(cur_prob)
-        }
-        return unigram_and_prob
+    return unigram_probs
 
+def get_bigram_prob(text, bigram, unigram):
+    bigram_probs = {}
+    for c in range(0, len(text)):
+        if c + 1 != len(text):
+            unigram_char = ''
+            unigram_char += text[c]
 
-assert_text_and_prob(unigram_prob('abc', 0, {'a': 1, 'b': 1, 'c': 1}), 'a', -1.0986122886681098)
+            bigram_char = ''
+            bigram_char += text[c] + text[c + 1]
 
+            unigram_count = unigram.get(unigram_char)
+            bigram_count = bigram.get(bigram_char)
 
-def bigram_prob(text, index, bigram, unigram):
-    if index+1 != len(text):
-        unigram_char = text[index]
-        bigram_char = text[index] + text[index+1]
+            try:
+                cur_prob = math.log(bigram_count / float(unigram_count))
+            except Exception as e:
+                cur_prob = sys.float_info.min
 
-        unigram_count = unigram.get(unigram_char)
-        bigram_count = bigram.get(bigram_char)
+            if bigram_char in bigram_probs.keys():
+                bigram_probs[bigram_char] += cur_prob
+            else:
+                bigram_probs[bigram_char] = cur_prob
 
-        cur_prob = bigram_count / float(unigram_count)
-
-        bigram_and_prob = {
-            'text': bigram_char,
-            'prob': math.log(cur_prob)
-        }
-        return bigram_and_prob
-    else:
-        return unigram_prob(text, index, unigram)
-
-
-assert_text_and_prob(bigram_prob('abc', 0, {'ab': 1, 'bc': 1},
-                                           {'a': 2, 'b': 2, 'c': 2}), 'ab', -0.6931471805599453)
-assert_text_and_prob(bigram_prob('abc', 1, {'ab': 1, 'bc': 1},
-                                           {'a': 2, 'b': 2, 'c': 2}), 'bc', -0.6931471805599453)
-assert_text_and_prob(bigram_prob('abc', 2, {'ab': 1, 'bc': 1},
-                                          {'a': 2, 'b': 2, 'c': 2}), 'c', -1.0986122886681098)
-assert_text_and_prob(bigram_prob('ab?', 2, {'ab': 1, 'bc': 1, 'b?': 1},
-                                           {'a': 2, 'b': 2, 'c': 2, '?': 3}), '?', -1.0986122886681098)
-assert_text_and_prob(bigram_prob('ab?c', 2, {'ab': 1, 'bc': 1, '?c': 1},
-                                            {'a': 2, 'b': 2, 'c': 2, '?': 3}), '?c', -1.0986122886681098)
-
-def trigram_prob(text, index, trigram, bigram, unigram):
-    if index + 2 < len(text):
-        bigram_char = text[index] + text[index + 1]
-        trigram_char = text[index] + text[index + 1] + text[index + 2]
-
-        bigram_count = bigram.get(bigram_char)
-        trigram_count = trigram.get(trigram_char)
-
-        cur_prob = trigram_count / float(bigram_count)
-        trigram_and_prob = {
-            'text': trigram_char,
-            'prob': math.log(cur_prob)
-        }
-        return trigram_and_prob
-    else:
-        return bigram_prob(text, index, bigram, unigram)
+    return bigram_probs
 
 
-assert_text_and_prob(trigram_prob('abc', 2, {'abc': 1},
-                                            {'ab': 1, 'bc': 1},
-                                            {'a': 2, 'b': 2, 'c': 2}),
-                                 'c',
-                                 -1.0986122886681098)
+def get_trigram_prob(text, trigram, bigram):
+    trigram_probs = {}
+    for c in range(0, len(text)):
+        if c + 2 < len(text):
+            trigram_char = ''
+            trigram_char += text[c] + text[c + 1] + text[c + 2]
 
-assert_text_and_prob(trigram_prob('abcdef',
-                                  2,
-                                 {'abc': 1, 'bcd': 1, 'cde': 1, 'def': 1},
-                                 {'ab': 1, 'bc': 1, 'cd': 3},
-                                 {'a': 2, 'b': 2, 'c': 2}),
-                                 'cde',
-                                 -1.0986122886681098)
+            bigram_char = ''
+            bigram_char += text[c] + text[c + 1]
+
+            trigram_count = trigram.get(trigram_char)
+            bigram_count = bigram.get(bigram_char)
+
+            try:
+                cur_prob = math.log(trigram_count / float(bigram_count))
+            except Exception as e:
+                cur_prob = sys.float_info.min
+
+            if trigram_char in trigram_probs.keys():
+                trigram_probs[trigram_char] += cur_prob
+            else:
+                trigram_probs[trigram_char] = cur_prob
+
+    return trigram_probs

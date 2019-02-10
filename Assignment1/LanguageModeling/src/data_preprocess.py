@@ -16,7 +16,7 @@ def replace_unk(line):
 
 def format_line(line):
     punctuation = ',.-";\'!_?:`)(&[]*}/$%>@<+=~\r'
-    unable_to_decode = '\x00\x01\x10\x08\x02\x04\x17\x80'
+    unable_to_decode = '\x00\x01\x10\x08\x02\x04\x17\x80ÿ'
 
     line = line.rstrip()  # remove blank lines
     line = ' '.join(line.split())  # remove duplicate spaces
