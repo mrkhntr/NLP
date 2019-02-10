@@ -1,12 +1,13 @@
+# coding=iso-8859-15
 import os
 import io
+import utils
 
 
 #  ? will be known as our <unk>
 def replace_unk(line):
-    unk = ['\x98', '\x85', '\x12', '\xa9', '\x18', '\x16', '\xf3', '\x0f', '\x13',
-           '\xe8', '\x1a', '\xe9', '\x15', '\xe6', '\x14', '\x03' '\x11', '\xee', '\x11',
-           '\x03']
+    unk = ['\x98', '\x12', '©', '\x18', '\x16', 'æ', '\x0f', '\x15', 'ó', '\x13', '\x1a', 'è',
+           'é', '\x11', '\x14', '\x03', 'î']
     if any(s in line for s in unk):
         for sym in unk:
             line = line.replace(sym, '?')
@@ -25,13 +26,11 @@ def format_line(line):
 
 
 def format_file(filename):
-    with io.open(filename, 'r', encoding='iso-8859-15') as f:
-        text = f.read()
+    text = utils.file_to_str(filename)
 
     text = format_line(text)
 
-    with io.open(filename, 'w', encoding='iso-8859-15') as f:
-        f.write(text)
+    utils.write_to_filepath(text, filename)
 
 
 def data_preprocess():

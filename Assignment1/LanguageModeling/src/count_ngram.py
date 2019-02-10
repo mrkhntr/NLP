@@ -1,6 +1,7 @@
 import os
 from collections import Counter
-import fileinput
+import io
+import utils
 
 training_set_path = os.getcwd() + '/gutenberg/'
 ngram_output_path = os.getcwd() + '/ngram_counts/'
@@ -53,9 +54,9 @@ def count_ngrams(ngram_method):
     file_names = os.listdir(training_set_path)
 
     for filename in file_names:
-        f = open(training_set_path + filename)
-        ngram += ngram_method(f.read().strip())
-        f.close()
+        with io.open(training_set_path + filename, 'r', encoding='iso-8859-15') as f:
+            text = f.read()
+            ngram += ngram_method(text.strip())
 
     return ngram
 
@@ -80,9 +81,11 @@ def jsonify_line(line):
 
 
 def jsonify_file(filename):
-    for line in fileinput.FileInput(filename, inplace=1):
-        line = jsonify_line(line)
-        print(line, end='')
+    text = utils.file_to_str(filename)
+
+    text = jsonify_line(text)
+
+    utils.write_to_filepath(text, filename)
 
 
 def main():

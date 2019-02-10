@@ -1,5 +1,6 @@
 import json
 import os
+import utils
 import probability_ngram
 import count_ngram
 from sklearn.model_selection import train_test_split
@@ -12,9 +13,7 @@ ngram_probability_path = os.getcwd() + '/ngram_probabilities/'
 def print_json_ngram_to_file(ngram, filename):
     file_path = ngram_probability_path + filename
 
-    text_file = open(file_path, "w")
-    text_file.write(str(ngram))
-    text_file.close()
+    utils.write_to_filepath(str(ngram), file_path)
     # count_ngram.jsonify_file(file_path)
 
 
