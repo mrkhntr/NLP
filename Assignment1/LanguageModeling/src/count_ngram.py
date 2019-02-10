@@ -1,43 +1,43 @@
 import os
 from collections import Counter
 import io
-import utils
 
 training_set_path = os.getcwd() + '/gutenberg/'
 ngram_output_path = os.getcwd() + '/ngram_counts/'
 
 
 def count_bigram(text):
-    bigram_count = Counter({})
+    bigram_count = {}
     for c in range(0, len(text)):
         if c+1 != len(text):
-            entry = ''
-            entry += text[c] + text[c+1]
+            bigram_chars = text[c] + text[c+1]
 
-            if entry in bigram_count:
-                bigram_count[entry] += 1
+            if bigram_chars in bigram_count:
+                cur_count = bigram_count.get(bigram_chars)
+                bigram_count.update({bigram_chars: cur_count + 1})
             else:
-                bigram_count[entry] = 1
+                bigram_count.update({bigram_chars: 1})
 
     return bigram_count
 
 
-assert(count_bigram('ab') == Counter({'ab': 1}))
-assert(count_bigram('abc') == Counter({'ab': 1, 'bc': 1}))
-assert(count_bigram('a bc') == Counter({' b': 1, 'a ': 1, 'bc': 1}))
-assert(count_bigram('a bca bca bc') == Counter({' b': 3, 'a ': 3, 'bc': 3, 'ca': 2}))
+assert(count_bigram('ab') == {'ab': 1})
+assert(count_bigram('abc') == {'ab': 1, 'bc': 1})
+assert(count_bigram('a bc') == {' b': 1, 'a ': 1, 'bc': 1})
+assert(count_bigram('a bca bca bc') == {' b': 3, 'a ': 3, 'bc': 3, 'ca': 2})
 
 
 def count_trigram(text):
-    trigram_count = Counter({})
+    trigram_count = {}
     for c in range(0, len(text)):
         if c + 2 < len(text):
-            entry = ''
-            entry += text[c] + text[c + 1] + text[c + 2]
-            if entry in trigram_count:
-                trigram_count[entry] += 1
+            trigram_chars = text[c] + text[c + 1] + text[c + 2]
+
+            if trigram_chars in trigram_count:
+                cur_count = trigram_count.get(trigram_chars)
+                trigram_count.update({trigram_chars: cur_count + 1})
             else:
-                trigram_count[entry] = 1
+                trigram_count.update({trigram_chars: 1})
 
     return trigram_count
 
@@ -48,55 +48,30 @@ assert(count_trigram('abcdef') == Counter({'abc': 1, 'bcd': 1, 'cde': 1, 'def': 
 assert(count_trigram('ab cab c') == Counter({'ab ': 2, 'b c': 2, 'cab': 1, ' ca': 1}))
 
 
-def count_ngrams(ngram_method):
-    ngram = Counter({})
-    training_set_path = os.getcwd() + '/gutenberg/'
-    file_names = os.listdir(training_set_path)
-
-    for filename in file_names:
-        with io.open(training_set_path + filename, 'r', encoding='iso-8859-15') as f:
-            text = f.read()
-            ngram += ngram_method(text.strip())
-
-    return ngram
-
-
-def print_json_ngram_to_file(ngram, filename):
+def print_ngram_to_file(ngram, filename):
     file_path = ngram_output_path + filename
 
     text_file = open(file_path, "w")
-    text_file.write(str(ngram))
+    text_file.write(str(ngram).replace(",", ",\n"))
     text_file.close()
-    jsonify_file(file_path)
-
-
-def jsonify_line(line):
-    # NOTE WE NEED TO REMOVE THE COUNTER FROM THE FIRST AND LAST LINE
-    line = line.replace("Counter(", "")
-    line = line.replace(")", "")
-
-    line = line.replace(',', ',\n')
-    line = line.replace("'", "\"")
-    return line
-
-
-def jsonify_file(filename):
-    text = utils.file_to_str(filename)
-
-    text = jsonify_line(text)
-
-    utils.write_to_filepath(text, filename)
 
 
 def main():
-    #  The Counter object by itself will just aggregate letter counts
-    unigram = count_ngrams(Counter)
-    bigram = count_ngrams(count_bigram)
-    trigram = count_ngrams(count_trigram)
+    training_set_path = os.getcwd() + '/gutenberg/'
+    training_files = os.listdir(training_set_path)
 
-    print_json_ngram_to_file(unigram, "unigram_counts.txt")
-    print_json_ngram_to_file(bigram, "bigram_counts.txt")
-    print_json_ngram_to_file(trigram, "trigram_counts.txt")
+    training_corpus = ''
+    for filename in training_files:
+        with io.open(training_set_path + filename, 'r', encoding='iso-8859-15') as f:
+            training_corpus = training_corpus + f.read()
+
+    unigram = Counter(training_corpus)
+    bigram = count_bigram(training_corpus)
+    trigram = count_trigram(training_corpus)
+
+    print_ngram_to_file(unigram, "unigram_counts.txt")
+    print_ngram_to_file(bigram, "bigram_counts.txt")
+    print_ngram_to_file(trigram, "trigram_counts.txt")
 
 
 main()
