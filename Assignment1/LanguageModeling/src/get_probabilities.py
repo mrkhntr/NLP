@@ -1,3 +1,4 @@
+# coding=iso-8859-15
 import json
 import os
 import utils

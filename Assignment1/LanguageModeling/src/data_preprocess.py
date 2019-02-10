@@ -16,11 +16,14 @@ def replace_unk(line):
 
 def format_line(line):
     punctuation = ',.-";\'!_?:`)(&[]*}/$%>@<+=~\r'
+    unable_to_decode = '\x00\x01\x10\x08\x02\x04\x17\x80'
 
     line = line.rstrip()  # remove blank lines
     line = ' '.join(line.split())  # remove duplicate spaces
+    ingore_undecodeable = str.maketrans('', '', unable_to_decode)
     remove_punc = str.maketrans('', '', punctuation)
     line = line.translate(remove_punc)  # remove punctuation
+    line = line.translate(ingore_undecodeable)  # remove undecodable characters
     line = replace_unk(line)
     return line
 
