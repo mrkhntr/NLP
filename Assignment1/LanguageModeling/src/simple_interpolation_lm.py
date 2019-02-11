@@ -1,15 +1,20 @@
 import probability_ngram
 import count_ngram
 from collections import Counter
-import sys
+import os
 import utils
+import sys
+
+perplexity_output_path = os.getcwd() + '/perplexities/'
+test_set_path = os.getcwd() + '/test_data/'
+test_files = os.listdir(test_set_path)
 
 
-def probability_or_min(ngram, char):
+def probability_or_zero(ngram, char):
     if ngram.get(char) is not None:
         return ngram.get(char)
     else:
-        return sys.float_info.min
+        return 0
 
 
 # return what unigram, bigram, trigram lambdas
@@ -47,9 +52,9 @@ def simple_grid_search(text, unigram, bigram, trigram):
             l_bi = cur_lambda_values[bigram_lambda_index]
             l_uni = cur_lambda_values[unigram_lambda_index]
 
-            cur_perplexity = simple_interpolation(text,
-                                                  unigram, bigram, trigram,
-                                                  l_tri, l_bi, l_uni)
+            cur_perplexity = interpolation_perplexity(text,
+                                                      unigram, bigram, trigram,
+                                                      l_tri, l_bi, l_uni)
 
             if cur_perplexity < min_perplexity:
                 min_perplexity = cur_perplexity
@@ -67,7 +72,7 @@ def simple_grid_search(text, unigram, bigram, trigram):
     return unigram_lambda, bigram_lambda, trigram_lambda
 
 
-def simple_interpolation(text, unigram, bigram, trigram, l_tri, l_bi, l_uni):
+def interpolation_perplexity(text, unigram, bigram, trigram, l_tri, l_bi, l_uni):
     probability_sum = 0
     n = len(text)
     for c in range(0, n):
@@ -76,12 +81,12 @@ def simple_interpolation(text, unigram, bigram, trigram, l_tri, l_bi, l_uni):
             bigram_char = text[c] + text[c+1]
             unigram_char = text[c]
 
-            trigram_prob = l_tri * probability_or_min(trigram,
-                                                      trigram_char)
-            bigram_prob = l_bi * probability_or_min(bigram,
-                                                    bigram_char)
-            unigram_prob = l_uni * probability_or_min(unigram,
-                                                      unigram_char)
+            trigram_prob = l_tri * probability_or_zero(trigram,
+                                                       trigram_char)
+            bigram_prob = l_bi * probability_or_zero(bigram,
+                                                     bigram_char)
+            unigram_prob = l_uni * probability_or_zero(unigram,
+                                                       unigram_char)
 
             probability_sum += (trigram_prob + bigram_prob + unigram_prob)
 
@@ -109,7 +114,29 @@ def main():
                                                                        bigram_probs,
                                                                        trigram_probs)
 
-    
+    print(unigram_lambda)
+    print(bigram_lambda)
+    print(trigram_lambda)
+
+    perplexities = open(perplexity_output_path + 'interpolation-perplexities.txt', "w")
+    perplexities_count = {}
+    for filename in test_files:
+        with open(test_set_path + filename, 'r', encoding='iso-8859-15') as cur_file:
+            file = cur_file.read()
+            score = interpolation_perplexity(file,
+                                             unigram_counts,
+                                             bigram_counts,
+                                             trigram_counts,
+                                             trigram_lambda,
+                                             bigram_lambda,
+                                             unigram_lambda)
+            perplexities.write(filename + ", " + str(score) + "\n")
+            perplexities_count.update({filename: str(score)})
+    perplexities.close()
+
+    top_fifty = open(perplexity_output_path + 'highest-50-perplexities.txt', "w")
+    top_fifty.write(str(Counter(perplexities_count).most_common(50)).replace('),', ',)\n'))
+    top_fifty.close()
 
 
 main()
