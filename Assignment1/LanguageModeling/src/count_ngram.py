@@ -59,7 +59,7 @@ def print_ngram_to_file(ngram, filename):
 def main():
     training_corpus = utils.training_set_to_str()
 
-    unigram = Counter(training_corpus)
+    unigram = dict(Counter(training_corpus))
     bigram = count_bigram(training_corpus)
     trigram = count_trigram(training_corpus)
 
