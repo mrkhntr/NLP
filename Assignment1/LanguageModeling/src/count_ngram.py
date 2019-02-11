@@ -12,11 +12,7 @@ def count_bigram(text):
         if c+1 != len(text):
             bigram_chars = text[c] + text[c+1]
 
-            if bigram_chars in bigram_count:
-                cur_count = bigram_count.get(bigram_chars)
-                bigram_count.update({bigram_chars: cur_count + 1})
-            else:
-                bigram_count.update({bigram_chars: 1})
+            utils.increment_dict(bigram_chars, bigram_count, 1)
 
     return bigram_count
 
@@ -33,11 +29,7 @@ def count_trigram(text):
         if c + 2 < len(text):
             trigram_chars = text[c] + text[c + 1] + text[c + 2]
 
-            if trigram_chars in trigram_count:
-                cur_count = trigram_count.get(trigram_chars)
-                trigram_count.update({trigram_chars: cur_count + 1})
-            else:
-                trigram_count.update({trigram_chars: 1})
+            utils.increment_dict(trigram_chars, trigram_count, 1)
 
     return trigram_count
 

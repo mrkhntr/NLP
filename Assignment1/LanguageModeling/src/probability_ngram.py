@@ -25,11 +25,7 @@ def get_unigram_prob(text, unigram):
 
             cur_prob = math.log(unigram_count / unigram_sum)
 
-            if unigram_char in unigram_probs:
-                prev_prob = unigram_probs.get(unigram_char)
-                unigram_probs.update({unigram_char: prev_prob + cur_prob})
-            else:
-                unigram_probs.update({unigram_char: cur_prob})
+            utils.increment_dict(unigram_char, unigram_probs, cur_prob)
 
     return unigram_probs
 
@@ -47,11 +43,7 @@ def get_bigram_prob(text, bigram, unigram):
 
             cur_prob = math.log(bigram_count / float(unigram_count))
 
-            if bigram_char in bigram_probs:
-                prev_prob = bigram_probs.get(bigram_char)
-                bigram_probs.update({bigram_char: prev_prob + cur_prob})
-            else:
-                bigram_probs.update({bigram_char: cur_prob})
+            utils.increment_dict(bigram_char, bigram_probs, cur_prob)
 
     return bigram_probs
 
@@ -75,10 +67,6 @@ def get_trigram_prob(text, trigram, bigram):
 
             cur_prob = math.log(trigram_count / float(bigram_count))
 
-            if trigram_char in trigram_probs:
-                prev_prob = trigram_probs.get(trigram_char)
-                trigram_probs.update({trigram_char: prev_prob + cur_prob})
-            else:
-                trigram_probs.update({trigram_char: cur_prob})
+            utils.increment_dict(trigram_char, trigram_probs, cur_prob)
 
     return trigram_probs

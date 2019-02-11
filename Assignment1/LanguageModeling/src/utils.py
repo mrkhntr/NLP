@@ -5,6 +5,13 @@ training_set_path = os.getcwd() + '/gutenberg/'
 training_files = os.listdir(training_set_path)
 
 
+def increment_dict(key, dict, increment):
+    if key not in dict:
+        dict[key] = increment
+    else:
+        dict[key] += increment
+
+
 def translate_to_unk(char, unigram):
     if unigram.get(char) is None:
         return '?'
