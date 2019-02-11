@@ -1,6 +1,6 @@
 import os
 from collections import Counter
-import io
+import utils
 
 training_set_path = os.getcwd() + '/gutenberg/'
 ngram_output_path = os.getcwd() + '/ngram_counts/'
@@ -57,13 +57,7 @@ def print_ngram_to_file(ngram, filename):
 
 
 def main():
-    training_set_path = os.getcwd() + '/gutenberg/'
-    training_files = os.listdir(training_set_path)
-
-    training_corpus = ''
-    for filename in training_files:
-        with io.open(training_set_path + filename, 'r', encoding='iso-8859-15') as f:
-            training_corpus = training_corpus + f.read()
+    training_corpus = utils.training_set_to_str()
 
     unigram = Counter(training_corpus)
     bigram = count_bigram(training_corpus)
