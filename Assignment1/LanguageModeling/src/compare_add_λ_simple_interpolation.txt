@@ -1,0 +1,23 @@
+======== Add λ Summary ========
+
+    Pros:
+        + Easier to implement
+        + Performs generally better when test set looks nothing like training set
+
+    Cons:
+        - Less accurate in general
+        - Sometimes gives too much probability to less likely <unk>
+        - Only comes up with one ngram with one perplexity in the end
+
+
+======== Simple Interpolation Summary ========
+
+    Pros:
+        + Generally more accurate than add-λ (lower perplexity)
+        + Fine-tunes several ngrams to actually compare multiple possible perplexities
+        + If the test set looks anything like the training set, it will very likely be
+          a better choice
+
+    Cons:
+        - Takes much longer to run
+        - Is more complex to implement

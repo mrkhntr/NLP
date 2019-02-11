@@ -5,6 +5,12 @@ training_set_path = os.getcwd() + '/gutenberg/'
 training_files = os.listdir(training_set_path)
 
 
+def translate_to_unk(char, unigram):
+    if unigram.get(char) is None:
+        return '?'
+    return char
+
+
 def training_set_to_str():
     training_corpus = ''
     for filename in training_files:

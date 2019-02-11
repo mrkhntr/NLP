@@ -77,9 +77,13 @@ def interpolation_perplexity(text, unigram, bigram, trigram, l_tri, l_bi, l_uni)
     n = len(text)
     for c in range(0, n):
         if c + 2 < n:
-            trigram_char = text[c] + text[c+1] + text[c+2]
-            bigram_char = text[c] + text[c+1]
-            unigram_char = text[c]
+            char1 = utils.translate_to_unk(text[c], unigram)
+            char2 = utils.translate_to_unk(text[c+1], unigram)
+            char3 = utils.translate_to_unk(text[c+2], unigram)
+
+            trigram_char = char1 + char2 + char3
+            bigram_char = char1 + char2
+            unigram_char = char1
 
             trigram_prob = l_tri * probability_or_zero(trigram,
                                                        trigram_char)
@@ -118,25 +122,18 @@ def main():
     print(bigram_lambda)
     print(trigram_lambda)
 
-    perplexities = open(perplexity_output_path + 'interpolation-perplexities.txt', "w")
     perplexities_count = {}
+    perplexities = open(os.getcwd() + '/perplexities/' + 'interpolation-perplexities.txt', "w")
     for filename in test_files:
-        with open(test_set_path + filename, 'r', encoding='iso-8859-15') as cur_file:
-            file = cur_file.read()
-            score = interpolation_perplexity(file,
-                                             unigram_counts,
-                                             bigram_counts,
-                                             trigram_counts,
-                                             trigram_lambda,
-                                             bigram_lambda,
-                                             unigram_lambda)
-            perplexities.write(filename + ", " + str(score) + "\n")
-            perplexities_count.update({filename: str(score)})
+        text = utils.file_to_str(os.getcwd() + '/test_data/' + filename)
+        score = interpolation_perplexity(text, unigram_probs, bigram_probs, trigram_probs, 0.9, 0.1, 0.0)
+        perplexities.write(filename + ", " + str(score) + "\n")
+        perplexities_count.update({filename: score})
     perplexities.close()
 
-    top_fifty = open(perplexity_output_path + 'highest-50-perplexities.txt', "w")
-    top_fifty.write(str(Counter(perplexities_count).most_common(50)).replace('),', ',)\n'))
-    top_fifty.close()
+    topfifty = open(perplexity_output_path + 'highest-50-perplexities.txt', "w")
+    topfifty.write(str(Counter(perplexities_count).most_common(50)).replace('),', '),\n'))
+    topfifty.close()
 
 
 main()

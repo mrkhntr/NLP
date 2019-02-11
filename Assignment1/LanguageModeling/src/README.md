@@ -27,10 +27,13 @@ to the console. 0.0 for the unigram lambda, 0.1 for the bigram
 lambda, and 0.9 for the trigram lambda. It will also 
 output interpolation-perplexities.txt and highest-50-perplexities.txt.
 
+
+#####Note: If one uses unigram, bigram, trigram counts instead of probabilities, the highest perplexity files are all french
 #####Note: The original submitted highest-50-perplexities.txt contains whether or not they are French.
 
 #### Add-λ Smoothing Language Model
 
 This model just needs the training set to be data_preprocess'd.
+The test_data needs to be unzipped.
 Running the add-λ-lm.py alone should give all perplexities.
  

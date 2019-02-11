@@ -10,20 +10,14 @@ test_files = os.listdir(test_set_path)
 perplexity_output_path = os.getcwd() + '/perplexities/'
 
 
-def translate_to_unk(char, unigram):
-    if unigram.get(char) is None:
-        return '?'
-    return char
-
-
 def perplexity(text, trigram, unigram):
     probability_sum = 0
     n = len(text)
     for c in range(0, n):
         if c + 2 < n:
-            trigram_char = translate_to_unk(text[c], unigram) \
-                           + translate_to_unk(text[c+1], unigram) \
-                           + translate_to_unk(text[c+2], unigram)
+            trigram_char = utils.translate_to_unk(text[c], unigram) \
+                           + utils.translate_to_unk(text[c+1], unigram) \
+                           + utils.translate_to_unk(text[c+2], unigram)
 
             if trigram.get(trigram_char) is not None:
                 trigram_prob = trigram.get(trigram_char)
