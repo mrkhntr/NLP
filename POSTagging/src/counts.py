@@ -41,7 +41,7 @@ def count_tag_unigram(tag_sentences):
 
     for sentence in tag_sentences:
         for tag in sentence:
-            utils.increment_dict(tag, tag_unigram)
+            utils.increment_dict(tag, tag_unigram, 1)
     return tag_unigram
 
 
@@ -52,7 +52,7 @@ def count_tag_bigram(tag_sentences):
         for tag_i in range(0, len(sentence)):
             if tag_i + 1 != len(sentence):
                 tag = sentence[tag_i] + ", " + sentence[tag_i + 1]
-                utils.increment_dict(tag, tag_bigram)
+                utils.increment_dict(tag, tag_bigram, 1)
     return tag_bigram
 
 
@@ -64,7 +64,7 @@ def count_word_tag(text):
         if "<s>" in sentence:
             word_tags = sentence.split(' ')
             for word_tag in word_tags:
-                utils.increment_dict(word_tag, word_tag_count)
+                utils.increment_dict(word_tag, word_tag_count, 1)
 
     word_tag_count.pop('<s>')
     word_tag_count.pop('</s>')
@@ -73,7 +73,6 @@ def count_word_tag(text):
 
 def print_ngram_to_file(ngram, filename):
     file_path = utils.count_output_path + filename
-
 
     text_file = open(file_path, "w")
     text_file.write(str(ngram))
@@ -92,9 +91,9 @@ def main():
     tag_unigram = count_tag_unigram(tag_sentences)
     tag_bigram = count_tag_bigram(tag_sentences)
 
-    print_ngram_to_file(word_tag_count, 'word-tag-counts.txt')
-    print_ngram_to_file(tag_unigram, 'tag_unigram.txt')
-    print_ngram_to_file(tag_bigram, 'tag_bigram.txt')
+    utils.print_dict_to_file(word_tag_count, utils.count_output_path + 'word-tag-counts.txt')
+    utils.print_dict_to_file(tag_unigram, utils.count_output_path + 'tag_unigram.txt')
+    utils.print_dict_to_file(tag_bigram, utils.count_output_path + 'tag_bigram.txt')
 
 
 main()

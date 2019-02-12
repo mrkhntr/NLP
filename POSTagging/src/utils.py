@@ -6,11 +6,11 @@ training_files = os.listdir(training_set_path)
 count_output_path = os.getcwd() + '/all_counts/'
 
 
-def increment_dict(key, dictionary):
+def increment_dict(key, dictionary, increment):
     if key not in dictionary:
-        dictionary[key] = 1
+        dictionary[key] = increment
     else:
-        dictionary[key] += 1
+        dictionary[key] += increment
 
 
 def training_set_to_str():
@@ -30,3 +30,9 @@ def file_to_str(filepath):
 def write_to_filepath(text, filepath):
     with io.open(filepath, 'w', encoding='iso-8859-15') as f:
         f.write(text)
+
+
+def print_dict_to_file(dict, filepath):
+    with io.open(filepath, 'w', encoding='iso-8859-15') as f:
+        for key in list(dict.keys()):
+            f.write("\"" + key + "\"" + ": " + str(dict[key]) + "\n")
