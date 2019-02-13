@@ -4,6 +4,7 @@ import os
 training_set_path = os.getcwd() + '/brown/'
 training_files = os.listdir(training_set_path)
 count_output_path = os.getcwd() + '/all_counts/'
+probabilities_path = os.getcwd() + '/all_probabilities/'
 
 
 def increment_dict(key, dictionary, increment):

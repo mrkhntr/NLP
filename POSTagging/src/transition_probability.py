@@ -3,7 +3,6 @@ import counts
 from collections import Counter
 import math
 import re
-import os
 
 
 def calculate_emission_probabilities(training_corpus, word_tag_count, tag_unigram):
@@ -12,7 +11,7 @@ def calculate_emission_probabilities(training_corpus, word_tag_count, tag_unigra
     emission_probabilities = Counter({})
     for sentence in sentence_array:
         if "<s>" in sentence:
-            word_tags = sentence.replace('<s> ', '').replace(' </s>', '').split(' ')
+            word_tags = sentence.split(' ')
             for word_tag in word_tags:
                 word_tag_c = word_tag_count[word_tag]
 
@@ -46,7 +45,9 @@ def calculate_transition_probabilities(tag_sentences, tag_bigram, tag_unigram):
 
 
 def main():
-    training_corpus = utils.training_set_to_str()
+
+    # TODO Look into <UNK> smoothing
+    training_corpus = utils.file_to_str(utils.training_set_path + '/ca01')  # utils.training_set_to_str()
     word_tag_count = counts.count_word_tag(training_corpus)
 
     tag_sentences = counts.get_tags(training_corpus)
@@ -56,12 +57,10 @@ def main():
     transition_probabilities = calculate_transition_probabilities(tag_sentences, tag_bigram, tag_unigram)
     emission_probabilities = calculate_emission_probabilities(training_corpus, word_tag_count, tag_unigram)
 
-    probabilities_path = os.getcwd() + '/all_probabilities/'
-
     utils.print_dict_to_file(transition_probabilities,
-                             probabilities_path + 'transition_probabilities.txt')
+                             utils.probabilities_path + 'transition_probabilities.txt')
     utils.print_dict_to_file(emission_probabilities,
-                             probabilities_path + 'emission_probabilities.txt')
+                             utils.probabilities_path + 'emission_probabilities.txt')
 
 
 main()

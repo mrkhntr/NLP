@@ -10,8 +10,6 @@ def get_tags(text):
     tag_sentences = []
     for sentence in sentence_array:
         if "<s>" in sentence:
-            sentence = sentence.replace("<s>", "")
-            sentence = sentence.replace("</s>", "")
             word_tags = sentence.split(' ')
             new_sentence = []
             for word_tag_i in range(0, len(word_tags)):
@@ -27,8 +25,8 @@ def add_start_end_token(filepath):
 
     new_file = ''
     for sentence in file:
-        sentence = "<s> " + sentence + " </s>" + '\n'
-        sentence = sentence.replace("<s>  </s>", "")
+        sentence = "<s> " + sentence + " <e>" + '\n'
+        sentence = sentence.replace("<s>  <e>", "")
         sentence = sentence.replace('\t', '')
 
         new_file += sentence
@@ -66,8 +64,8 @@ def count_word_tag(text):
             for word_tag in word_tags:
                 utils.increment_dict(word_tag, word_tag_count, 1)
 
-    word_tag_count.pop('<s>')
-    word_tag_count.pop('</s>')
+    # word_tag_count.pop('<s>')
+    # word_tag_count.pop('<e>')
     return word_tag_count
 
 
@@ -96,4 +94,4 @@ def main():
     utils.print_dict_to_file(tag_bigram, utils.count_output_path + 'tag_bigram.txt')
 
 
-main()
+# main()
