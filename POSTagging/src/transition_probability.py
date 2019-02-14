@@ -5,7 +5,7 @@ import math
 import re
 
 
-def calculate_emission_probabilities(training_corpus, word_tag_count, tag_unigram):
+def calc_emission_probs(training_corpus, word_tag_count, tag_unigram):
     sentence_array = training_corpus.splitlines()
 
     emission_probabilities = Counter({})
@@ -25,7 +25,7 @@ def calculate_emission_probabilities(training_corpus, word_tag_count, tag_unigra
     return emission_probabilities
 
 
-def calculate_transition_probabilities(tag_sentences, tag_bigram, tag_unigram):
+def calc_transition_probs(tag_sentences, tag_bigram, tag_unigram):
     bigram_probs = Counter({})
 
     for sentence in tag_sentences:
@@ -54,8 +54,8 @@ def main():
     tag_unigram = counts.count_tag_unigram(tag_sentences)
     tag_bigram = counts.count_tag_bigram(tag_sentences)
 
-    transition_probabilities = calculate_transition_probabilities(tag_sentences, tag_bigram, tag_unigram)
-    emission_probabilities = calculate_emission_probabilities(training_corpus, word_tag_count, tag_unigram)
+    transition_probabilities = calc_transition_probs(tag_sentences, tag_bigram, tag_unigram)
+    emission_probabilities = calc_emission_probs(training_corpus, word_tag_count, tag_unigram)
 
     utils.print_dict_to_file(transition_probabilities,
                              utils.probabilities_path + 'transition_probabilities.txt')
@@ -63,4 +63,4 @@ def main():
                              utils.probabilities_path + 'emission_probabilities.txt')
 
 
-main()
+# main()

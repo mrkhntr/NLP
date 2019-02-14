@@ -1,10 +1,22 @@
 import io
 import os
+import operator
+import sys
 
 training_set_path = os.getcwd() + '/brown/'
 training_files = os.listdir(training_set_path)
 count_output_path = os.getcwd() + '/all_counts/'
 probabilities_path = os.getcwd() + '/all_probabilities/'
+
+
+def max_value_key(dictionary):
+    return max(dictionary.items(), key=operator.itemgetter(1))[0]
+
+
+# referenced https://stackoverflow.com/questions
+#            /23862406/filter-items-in-a-python-dictionary-where-keys-contain-a-specific-string
+def dict_items_with_substring(substring, dict):
+    return {k: v for (k, v) in dict.items() if substring in k}
 
 
 def increment_dict(key, dictionary, increment):

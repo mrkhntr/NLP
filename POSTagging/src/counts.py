@@ -25,6 +25,8 @@ def add_start_end_token(filepath):
 
     new_file = ''
     for sentence in file:
+        if "<s> " in sentence:
+            return
         sentence = "<s> " + sentence + " <e>" + '\n'
         sentence = sentence.replace("<s>  <e>", "")
         sentence = sentence.replace('\t', '')
@@ -40,6 +42,18 @@ def count_tag_unigram(tag_sentences):
     for sentence in tag_sentences:
         for tag in sentence:
             utils.increment_dict(tag, tag_unigram, 1)
+    #
+    # actual_unk_elems = []
+    # unk_count = 0
+    # for tag, count in tag_unigram.items():
+    #     if count < 6:
+    #         actual_unk_elems.append(tag)
+    #         unk_count += 1
+    #
+    # utils.increment_dict('<UNK>', tag_unigram, unk_count)
+    # for elem in actual_unk_elems:
+    #     tag_unigram.pop(elem)
+    #
     return tag_unigram
 
 
@@ -94,4 +108,4 @@ def main():
     utils.print_dict_to_file(tag_bigram, utils.count_output_path + 'tag_bigram.txt')
 
 
-# main()
+main()
