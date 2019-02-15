@@ -2,6 +2,7 @@ import utils
 import os
 from collections import Counter
 import re
+from collections import defaultdict
 
 
 def get_tags(text):
@@ -42,23 +43,11 @@ def count_tag_unigram(tag_sentences):
     for sentence in tag_sentences:
         for tag in sentence:
             utils.increment_dict(tag, tag_unigram, 1)
-    #
-    # actual_unk_elems = []
-    # unk_count = 0
-    # for tag, count in tag_unigram.items():
-    #     if count < 6:
-    #         actual_unk_elems.append(tag)
-    #         unk_count += 1
-    #
-    # utils.increment_dict('<UNK>', tag_unigram, unk_count)
-    # for elem in actual_unk_elems:
-    #     tag_unigram.pop(elem)
-    #
     return tag_unigram
 
 
 def count_tag_bigram(tag_sentences):
-    tag_bigram = Counter({})
+    tag_bigram = defaultdict(lambda: 0, {})
 
     for sentence in tag_sentences:
         for tag_i in range(0, len(sentence)):
@@ -78,9 +67,19 @@ def count_word_tag(text):
             for word_tag in word_tags:
                 utils.increment_dict(word_tag, word_tag_count, 1)
 
-    # word_tag_count.pop('<s>')
-    # word_tag_count.pop('<e>')
-    return word_tag_count
+    final_counts = defaultdict(lambda: 0, {})
+
+    for word_tag in word_tag_count:
+        cur_count = word_tag_count.get(word_tag)
+
+        if cur_count < 6:
+            just_tag = re.sub(r".*\/", "", word_tag)
+            unk_tag = '<unk>/' + just_tag
+            utils.increment_dict(unk_tag, final_counts, cur_count)
+        else:
+            final_counts.update({word_tag: cur_count})
+
+    return final_counts
 
 
 def print_ngram_to_file(ngram, filename):
