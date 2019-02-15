@@ -7,6 +7,7 @@ training_set_path = os.getcwd() + '/brown/'
 training_files = os.listdir(training_set_path)
 count_output_path = os.getcwd() + '/all_counts/'
 probabilities_path = os.getcwd() + '/all_probabilities/'
+test_file_path = os.getcwd() + '/Test_File.txt'
 
 
 def max_value_key(dictionary):
@@ -17,6 +18,13 @@ def max_value_key(dictionary):
 #            /23862406/filter-items-in-a-python-dictionary-where-keys-contain-a-specific-string
 def dict_items_with_substring(substring, dict):
     return {k: v for (k, v) in dict.items() if substring in k}
+
+
+def mult_inc_dict(key, dictionary, increment):
+    if key not in dictionary:
+        dictionary[key] = increment
+    else:
+        dictionary[key] *= increment
 
 
 def increment_dict(key, dictionary, increment):

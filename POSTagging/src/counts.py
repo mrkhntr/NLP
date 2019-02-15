@@ -57,7 +57,7 @@ def count_tag_bigram(tag_sentences):
     return tag_bigram
 
 
-def count_word_tag(text):
+def count_word_tag(text, unk_smoothing=True):
     sentence_array = text.splitlines()
 
     word_tag_count = Counter({})
@@ -67,17 +67,19 @@ def count_word_tag(text):
             for word_tag in word_tags:
                 utils.increment_dict(word_tag, word_tag_count, 1)
 
-    final_counts = defaultdict(lambda: 0, {})
+    if unk_smoothing:
+        final_counts = defaultdict(lambda: 0, {})
+        for word_tag in word_tag_count:
+            cur_count = word_tag_count.get(word_tag)
 
-    for word_tag in word_tag_count:
-        cur_count = word_tag_count.get(word_tag)
-
-        if cur_count < 6:
-            just_tag = re.sub(r".*\/", "", word_tag)
-            unk_tag = '<unk>/' + just_tag
-            utils.increment_dict(unk_tag, final_counts, cur_count)
-        else:
-            final_counts.update({word_tag: cur_count})
+            if cur_count < 6:
+                just_tag = re.sub(r".*\/", "", word_tag)
+                unk_tag = '<unk>/' + just_tag
+                utils.increment_dict(unk_tag, final_counts, cur_count)
+            else:
+                final_counts.update({word_tag: cur_count})
+    else:
+        final_counts = defaultdict(lambda: 0, word_tag_count)
 
     return final_counts
 
