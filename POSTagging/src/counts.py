@@ -37,23 +37,32 @@ def add_start_end_token(filepath):
     utils.write_to_filepath(new_file, filepath)
 
 
-def count_tag_unigram(tag_sentences):
-    tag_unigram = Counter({})
+def count_tag_unigram(tag_sentences, include_sent_token=True):
+    tag_unigram = defaultdict(lambda: 0, {})
 
     for sentence in tag_sentences:
         for tag in sentence:
-            utils.increment_dict(tag, tag_unigram, 1)
+            if not include_sent_token and tag in ['<s>', '<e>', 's>']:
+                pass  # do not add this tag
+            else:
+                utils.increment_dict(tag, tag_unigram, 1)
+
     return tag_unigram
 
 
-def count_tag_bigram(tag_sentences):
+def count_tag_bigram(tag_sentences, include_sent_token=True):
     tag_bigram = defaultdict(lambda: 0, {})
 
     for sentence in tag_sentences:
         for tag_i in range(0, len(sentence)):
             if tag_i + 1 != len(sentence):
-                tag = sentence[tag_i] + ", " + sentence[tag_i + 1]
-                utils.increment_dict(tag, tag_bigram, 1)
+                tag1 = sentence[tag_i]
+                tag2 = sentence[tag_i + 1]
+                if not include_sent_token and (tag1 in ['<s>', 's>'] or tag2 in ['s>', '<e>']):
+                    pass  # do not add this tag
+                else:
+                    tag = sentence[tag_i] + ", " + sentence[tag_i + 1]
+                    utils.increment_dict(tag, tag_bigram, 1)
     return tag_bigram
 
 
@@ -101,8 +110,8 @@ def main():
     word_tag_count = count_word_tag(training_corpus)
 
     tag_sentences = get_tags(training_corpus)
-    tag_unigram = count_tag_unigram(tag_sentences)
-    tag_bigram = count_tag_bigram(tag_sentences)
+    tag_unigram = count_tag_unigram(tag_sentences, include_sent_token=True)
+    tag_bigram = count_tag_bigram(tag_sentences, include_sent_token=True)
 
     utils.print_dict_to_file(word_tag_count, utils.count_output_path + 'word-tag-counts.txt')
     utils.print_dict_to_file(tag_unigram, utils.count_output_path + 'tag_unigram.txt')
