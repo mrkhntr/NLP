@@ -1,10 +1,8 @@
 import utils
-import os
 import counts
 import calculate_probabilities
 import random
 import re
-import sys
 
 
 def generate_sentence(trans_probs, emission_probs):
@@ -19,7 +17,6 @@ def generate_sentence(trans_probs, emission_probs):
         prob *= trans_probs[fst_snd_tag]
         second_tag = re.sub(r".*, ", "", fst_snd_tag)
 
-        # TODO: Fix this
         if second_tag == '<e>':
             break
 
@@ -32,7 +29,6 @@ def generate_sentence(trans_probs, emission_probs):
         # Add word to sentence
         first_tag = second_tag
         sent += next_word + ' '
-    # sent += ' <e>'
     return sent, prob
 
 
@@ -54,7 +50,7 @@ def gen_sentences():
         sentences += '<s> ' + sentence + '<e>\n'
         sentences += str(prob) + '\n\n'
 
-    utils.write_to_filepath(sentences, os.getcwd() + '/generated_sentences.txt')
+    utils.write_to_filepath(sentences, utils.solutions_path + 'generated_sentences.txt')
 
 
 gen_sentences()

@@ -6,17 +6,11 @@ import sys
 from collections import defaultdict
 
 
-# the sentence this function receives will only be the words + punc
-# THIS MEANS NO sentence_id and no <EOS>
-def viterbi(sentence, trans_probs, emission_probs, tag_unigram):
-    sentence_array = sentence.splitlines()
-
+def viterbi(sentence_array, trans_probs, emission_probs, tag_unigram):
     π = []  # Represented by [ { all_possible_tags }, { apt }2, { apt }3, ... {apt}n] n = len(sentence)
-    bp = []  # Represented by [ { state_1: start, state_2: start...},
-    #    { state_1: max_prev_state, state_2: max_prev_state...}
-    #    ... ]
 
-    initial_word = sentence[0]
+    # initialize the states in the first entry's dictionary
+    initial_word = sentence_array[0]
     init_state_probs = defaultdict(lambda: 1 / sum(tag_unigram.values()))
     init_bps = {}
     for state in tag_unigram.keys():
@@ -25,33 +19,37 @@ def viterbi(sentence, trans_probs, emission_probs, tag_unigram):
         init_bps.update({state: '<START>'})
 
     π.append(init_state_probs)
-    bp.append(init_bps)
 
     for word_i in range(1, len(sentence_array)):
         all_state_probs = defaultdict(lambda: 1 / sum(tag_unigram.values()))
         cur_bp_states = {}
         π.append(all_state_probs)
-        bp.append(cur_bp_states)
 
+        # for a given state that word_i would end at
         for possible_next_state in tag_unigram.keys():
             max_state_prob = -sys.maxsize - 1
             max_state_prime = None
 
+            # for any state that word_i may have come from in the previous index
             for state_prime in tag_unigram.keys():
                 pos_prev_state = π[word_i - 1][state_prime]
+                # transitioning from that theoretical previous state, to this considered state
                 trans_prob = trans_probs[state_prime + ', ' + possible_next_state]
+                # the probability that this word belongs to this potential state
                 emission_prob = emission_probs[sentence_array[word_i] + '/' + possible_next_state]
 
+                # calculate the probability of this word, tag pairing
                 cur_state_prob = pos_prev_state * trans_prob * emission_prob
 
                 if cur_state_prob > max_state_prob:
                     max_state_prob = cur_state_prob
                     max_state_prime = state_prime
 
+            # take the maximum state_prime to this considered state, and attach that
+            # to this π[word_i][possible_next_state]
             utils.increment_dict(max_state_prime, all_state_probs, max_state_prob)
-            cur_max_state = utils.max_value_key(all_state_probs)
-            cur_bp_states.update({possible_next_state: cur_max_state})
 
+    # iterate through each word_i and get the most likely state at that word_i
     best_path = []
     best_path_prob = 1
     for word_i in range(1, len(sentence_array)):
@@ -73,24 +71,25 @@ def main():
     tag_bigram = counts.count_tag_bigram(tag_sentences, include_sent_token=False)
 
     trans_probs = calculate_probabilities.calc_transition_probs(tag_bigram, tag_unigram)
-
     emission_probs = calculate_probabilities.calc_emission_probs(word_tag_count, tag_unigram)
 
     test_file = utils.file_to_str(utils.test_file_path)
     test_file_sentences = test_file.split('<EOS>')
-    test_file_sentences.pop(125)  # Last sentence is empty
+    test_file_sentences.pop(len(test_file_sentences) - 1)  # Last sentence is empty
 
     output = ''
     for sentence in test_file_sentences:
         sentence_tag = sentence.lstrip().split('\n')[0]
         sentence = re.sub(r"" + sentence_tag + '\n', "", sentence).lstrip()
-        best_path, best_path_prob = viterbi(sentence, trans_probs, emission_probs, tag_unigram)
+        sentence_array = sentence.splitlines()
+        best_path, best_path_prob = viterbi(sentence_array, trans_probs, emission_probs, tag_unigram)
         output += sentence_tag + '\n'
         for i in range(0, len(best_path)):
-            output += sentence[i] + ', ' + best_path[i]
+            output += sentence_array[i] + ', ' + best_path[i] + '\n'
         output += '<EOS>\n'
 
-    utils.write_to_filepath(output, 'Test_File_Solution.txt')
+    # use solutions path here
+    utils.write_to_filepath(output, utils.solutions_path + 'Test_File_Solution.txt')
 
 
 main()
