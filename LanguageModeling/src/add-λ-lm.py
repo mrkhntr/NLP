@@ -16,6 +16,7 @@ def perplexity(text, trigram, unigram):
     n = len(text)
     for c in range(0, n):
         if c + 2 < n:
+            # get unk char instead of char if not found
             trigram_char = utils.translate_to_unk(text[c], unigram) \
                            + utils.translate_to_unk(text[c+1], unigram) \
                            + utils.translate_to_unk(text[c+2], unigram)
@@ -23,6 +24,7 @@ def perplexity(text, trigram, unigram):
             trigram_prob = trigram[trigram_char]
             probability_sum += trigram_prob
 
+            # invert and negate the log sum of probabilities
     return (-1/n) * probability_sum
 
 

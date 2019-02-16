@@ -21,6 +21,7 @@ def probability_or_zero(ngram, char):
 # return what unigram, bigram, trigram lambdas
 # should be
 def simple_grid_search(text, unigram, bigram, trigram):
+    #all combinations of lambdas
     all_combos = [[0.1, 0.1, 0.8],
                   [0.1, 0.2, 0.7],
                   [0.1, 0.3, 0.6],
@@ -31,6 +32,7 @@ def simple_grid_search(text, unigram, bigram, trigram):
                   [0.2, 0.5, 0.3],
                   [0.3, 0.3, 0.4]]
 
+    # all orders the lambdas are applied to ngrams
     all_indices = [[0, 1, 2],
                    [0, 2, 1],
                    [1, 0, 2],
