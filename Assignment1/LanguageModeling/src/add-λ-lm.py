@@ -3,6 +3,7 @@ import math
 import count_ngram
 import utils
 import os
+from collections import defaultdict
 
 # According to ngram_counts/unigram_counts.txt
 test_set_path = os.getcwd() + '/test_data/'
@@ -19,30 +20,27 @@ def perplexity(text, trigram, unigram):
                            + utils.translate_to_unk(text[c+1], unigram) \
                            + utils.translate_to_unk(text[c+2], unigram)
 
-            if trigram.get(trigram_char) is not None:
-                trigram_prob = trigram.get(trigram_char)
-                probability_sum += trigram_prob
+            trigram_prob = trigram[trigram_char]
+            probability_sum += trigram_prob
 
     return (-1/n) * probability_sum
 
 
-def get_trigram_prob(text, trigram, bigram, λ, vocabulary_size):
-    trigram_probs = {}
-    for c in range(0, len(text)):
-        if c + 2 < len(text):
-            trigram_char = text[c] + text[c + 1] + text[c + 2]
-            bigram_char = text[c] + text[c + 1]
+def get_trigram_prob(trigram, bigram, unigram, λ, vocabulary_size):
+    trigram_probs = defaultdict(lambda: 1/(float(sum(unigram.values()))), {})
+    for trigram_char in trigram:
+        bigram_char = trigram_char[0] + trigram_char[1]
 
-            trigram_count = trigram.get(trigram_char)
-            bigram_count = bigram.get(bigram_char)
+        trigram_count = trigram[trigram_char]
+        bigram_count = bigram[bigram_char]
 
-            cur_prob = math.log((trigram_count + λ) / float(bigram_count + vocabulary_size))
+        cur_prob = math.log((trigram_count + λ) / float(bigram_count + vocabulary_size))
 
-            if trigram_char in trigram_probs:
-                prev_prob = trigram_probs.get(trigram_char)
-                trigram_probs.update({trigram_char: prev_prob + cur_prob})
-            else:
-                trigram_probs.update({trigram_char: cur_prob})
+        if trigram_char in trigram_probs:
+            prev_prob = trigram_probs[trigram_char]
+            trigram_probs.update({trigram_char: prev_prob + cur_prob})
+        else:
+            trigram_probs.update({trigram_char: cur_prob})
 
     return trigram_probs
 
@@ -52,11 +50,14 @@ def main():
 
     unigram_counts = Counter(training_corpus)
     vocab_size = len(unigram_counts)
+    unigram_counts = dict(Counter(training_corpus))
     bigram_counts = count_ngram.count_bigram(training_corpus)
     trigram_counts = count_ngram.count_trigram(training_corpus)
-    trigram_probs = get_trigram_prob(training_corpus,
-                                     trigram_counts,
-                                     bigram_counts, 0.1, vocab_size)
+    trigram_probs = get_trigram_prob(trigram_counts,
+                                     bigram_counts,
+                                     unigram_counts, 0.1, vocab_size)
+
+    print(trigram_probs)
 
     perplexities = open(perplexity_output_path + 'add-λ-perplexities.txt', "w")
     for filename in test_files:

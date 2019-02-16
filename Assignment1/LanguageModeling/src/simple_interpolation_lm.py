@@ -1,6 +1,7 @@
 import probability_ngram
 import count_ngram
 from collections import Counter
+from collections import defaultdict
 import os
 import utils
 import sys
@@ -20,14 +21,15 @@ def probability_or_zero(ngram, char):
 # return what unigram, bigram, trigram lambdas
 # should be
 def simple_grid_search(text, unigram, bigram, trigram):
-    all_combos = [[0.1, 0.2, 0.7],
+    all_combos = [[0.1, 0.1, 0.8],
+                  [0.1, 0.2, 0.7],
                   [0.1, 0.3, 0.6],
                   [0.1, 0.4, 0.5],
-                  [0.1, 0.9, 0.0],
+                  [0.2, 0.2, 0.6],
                   [0.2, 0.3, 0.5],
-                  [0.2, 0.8, 0.0],
-                  [0.3, 0.7, 0.0],
-                  [0.4, 0.6, 0.0]]
+                  [0.2, 0.4, 0.4],
+                  [0.2, 0.5, 0.3],
+                  [0.3, 0.3, 0.4]]
 
     all_indices = [[0, 1, 2],
                    [0, 2, 1],
@@ -85,12 +87,9 @@ def interpolation_perplexity(text, unigram, bigram, trigram, l_tri, l_bi, l_uni)
             bigram_char = char1 + char2
             unigram_char = char1
 
-            trigram_prob = l_tri * probability_or_zero(trigram,
-                                                       trigram_char)
-            bigram_prob = l_bi * probability_or_zero(bigram,
-                                                     bigram_char)
-            unigram_prob = l_uni * probability_or_zero(unigram,
-                                                       unigram_char)
+            trigram_prob = l_tri * trigram[trigram_char]
+            bigram_prob = l_bi * bigram[bigram_char]
+            unigram_prob = l_uni * unigram[unigram_char]
 
             probability_sum += (trigram_prob + bigram_prob + unigram_prob)
 
@@ -104,14 +103,14 @@ def main():
     train = training_corpus[0:divider]
     held_out = training_corpus[divider:]
 
-    unigram_counts = dict(Counter(train))
-    unigram_probs = probability_ngram.get_unigram_prob(train, unigram_counts)
+    unigram_counts = defaultdict(lambda: 0, (Counter(train)))
+    unigram_probs = probability_ngram.get_unigram_probs(unigram_counts)
 
     bigram_counts = count_ngram.count_bigram(train)
-    bigram_probs = probability_ngram.get_bigram_prob(train, bigram_counts, unigram_counts)
+    bigram_probs = probability_ngram.get_bigram_probs(bigram_counts, unigram_counts)
 
     trigram_counts = count_ngram.count_trigram(train)
-    trigram_probs = probability_ngram.get_trigram_prob(train, trigram_counts, bigram_counts)
+    trigram_probs = probability_ngram.get_trigram_probs(trigram_counts, bigram_counts, unigram_counts)
 
     unigram_lambda, bigram_lambda, trigram_lambda = simple_grid_search(held_out,
                                                                        unigram_probs,

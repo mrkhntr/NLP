@@ -1,5 +1,6 @@
 import os
 from collections import Counter
+from collections import defaultdict
 import utils
 
 training_set_path = os.getcwd() + '/gutenberg/'
@@ -7,7 +8,7 @@ ngram_output_path = os.getcwd() + '/ngram_counts/'
 
 
 def count_bigram(text):
-    bigram_count = {}
+    bigram_count = defaultdict(lambda: 0, {})
     for c in range(0, len(text)):
         if c+1 != len(text):
             bigram_chars = text[c] + text[c+1]
@@ -24,7 +25,7 @@ assert(count_bigram('a bca bca bc') == {' b': 3, 'a ': 3, 'bc': 3, 'ca': 2})
 
 
 def count_trigram(text):
-    trigram_count = {}
+    trigram_count = defaultdict(lambda: 0, {})
     for c in range(0, len(text)):
         if c + 2 < len(text):
             trigram_chars = text[c] + text[c + 1] + text[c + 2]
@@ -51,13 +52,13 @@ def print_ngram_to_file(ngram, filename):
 def main():
     training_corpus = utils.training_set_to_str()
 
-    unigram = dict(Counter(training_corpus))
+    unigram = defaultdict(lambda: 0, (Counter(training_corpus)))
     bigram = count_bigram(training_corpus)
     trigram = count_trigram(training_corpus)
 
-    print_ngram_to_file(unigram, "unigram_counts.txt")
-    print_ngram_to_file(bigram, "bigram_counts.txt")
-    print_ngram_to_file(trigram, "trigram_counts.txt")
+    print_ngram_to_file(dict(unigram), "unigram_counts.txt")
+    print_ngram_to_file(dict(bigram), "bigram_counts.txt")
+    print_ngram_to_file(dict(trigram), "trigram_counts.txt")
 
 
 main()

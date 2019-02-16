@@ -1,6 +1,7 @@
 import math
 import os
 import utils
+from collections import defaultdict
 
 training_set_path = os.getcwd() + '/gutenberg/'
 file_names = os.listdir(training_set_path)
@@ -13,60 +14,46 @@ def print_prob_ngram_to_file(ngram, filename):
     utils.write_to_filepath(str(ngram).replace(",", ",\n"), file_path)
 
 
-def get_unigram_prob(text, unigram):
-    unigram_probs = {}
+def get_unigram_probs(unigram):
     unigram_sum = float(sum(unigram.values()))
+    unigram_probs = defaultdict(lambda: 1/unigram_sum, {})
 
-    for c in range(0, len(text)):
-        if c + 1 != len(text):
-            unigram_char = text[c]
+    for unigram_char in unigram:
+        unigram_count = unigram.get(unigram_char)
 
-            unigram_count = unigram.get(unigram_char)
+        cur_prob = math.log(unigram_count / unigram_sum)
 
-            cur_prob = math.log(unigram_count / unigram_sum)
-
-            utils.increment_dict(unigram_char, unigram_probs, cur_prob)
+        utils.increment_dict(unigram_char, unigram_probs, cur_prob)
 
     return unigram_probs
 
 
-def get_bigram_prob(text, bigram, unigram):
-    bigram_probs = {}
-    for c in range(0, len(text)):
-        if c + 1 != len(text):
-            unigram_char = text[c]
+def get_bigram_probs(bigram, unigram):
+    bigram_probs = defaultdict(lambda: 1/(float(sum(unigram.values()))), {})
+    for bigram_char in bigram:
+        unigram_char = bigram_char[0]
 
-            bigram_char = text[c] + text[c + 1]
+        unigram_count = unigram.get(unigram_char)
+        bigram_count = bigram.get(bigram_char)
 
-            unigram_count = unigram.get(unigram_char)
-            bigram_count = bigram.get(bigram_char)
+        cur_prob = math.log(bigram_count / float(unigram_count))
 
-            cur_prob = math.log(bigram_count / float(unigram_count))
-
-            utils.increment_dict(bigram_char, bigram_probs, cur_prob)
+        utils.increment_dict(bigram_char, bigram_probs, cur_prob)
 
     return bigram_probs
 
 
-assert(get_bigram_prob('sissi',
-                       {'si': 2, 'is': 1, 'ss': 1},
-                       {'s': 3, 'i': 2}) == {'si': -0.8109302162163289,
-                                             'is': -0.6931471805599453,
-                                             'ss': -1.0986122886681098})
+def get_trigram_probs(trigram, bigram, unigram):
+    trigram_probs = defaultdict(lambda: 1/(float(sum(unigram.values()))), {})
 
+    for trigram_char in trigram:
+        bigram_char = trigram_char[0] + trigram_char[1]
 
-def get_trigram_prob(text, trigram, bigram):
-    trigram_probs = {}
-    for c in range(0, len(text)):
-        if c + 2 < len(text):
-            trigram_char = text[c] + text[c + 1] + text[c + 2]
-            bigram_char = text[c] + text[c + 1]
+        trigram_count = trigram.get(trigram_char)
+        bigram_count = bigram.get(bigram_char)
 
-            trigram_count = trigram.get(trigram_char)
-            bigram_count = bigram.get(bigram_char)
+        cur_prob = math.log(trigram_count / float(bigram_count))
 
-            cur_prob = math.log(trigram_count / float(bigram_count))
-
-            utils.increment_dict(trigram_char, trigram_probs, cur_prob)
+        utils.increment_dict(trigram_char, trigram_probs, cur_prob)
 
     return trigram_probs
