@@ -34,7 +34,6 @@ def get_max_review_len():
         if num_words > max_train_len:
             max_train_len = num_words
 
-    print(max_train_len)
     return max_train_len
 
 
@@ -60,7 +59,7 @@ def encode_train_data(word_index_dict):
 
     df = pd.DataFrame(d, columns=('Encoded Review', 'Class'))
 
-    return df
+    return df, max_train_len
 
 
 def add_word_list_to_dictionary(l, dictionary, word_index):
@@ -69,13 +68,3 @@ def add_word_list_to_dictionary(l, dictionary, word_index):
             dictionary[item] = word_index
             word_index += 1
     return word_index
-
-
-def main():
-    word_index_dict = word_index_dictionary()
-    df = encode_train_data(word_index_dict)
-
-    utils.write_to_filepath(str(df), 'df.txt')
-
-
-main()
